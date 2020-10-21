@@ -15,26 +15,30 @@
 #import <FBRetainCycleDetector/FBRetainCycleDetector.h>
 #endif
 
+#import "ECOClient.h"
+
 @implementation FBObjectiveCObject (EchoFixNSMapTableCrash)
 
 + (void)load {
+    if([ECOClient sharedClient].config.retainCircleDetector) {
 #if __has_include(<FBRetainCycleDetector/FBRetainCycleDetector.h>)
 #if __has_include(<RSSwizzle/RSSwizzle.h>)
-    RSSwizzleInstanceMethod(FBObjectiveCObject, @selector(_objectRetainsEnumerableKeys) , BOOL, void, RSSWReplacement({
-        /// addtional hook logic
-        SEL objSel = NSSelectorFromString(@"object");
-        id  object = [self performSelector:objSel];
-        if ([object respondsToSelector:@selector(pointerFunctions)]) {
-          NSPointerFunctions *pointerFunctions = [object pointerFunctions];
-          if (pointerFunctions.acquireFunction == NULL) {
-            return NO;
-          }
-        }
-        BOOL result = RSSWCallOriginal();
-        return result;
-    }), 0, NULL)
+        RSSwizzleInstanceMethod(FBObjectiveCObject, @selector(_objectRetainsEnumerableKeys) , BOOL, void, RSSWReplacement({
+            /// addtional hook logic
+            SEL objSel = NSSelectorFromString(@"object");
+            id  object = [self performSelector:objSel];
+            if ([object respondsToSelector:@selector(pointerFunctions)]) {
+                NSPointerFunctions *pointerFunctions = [object pointerFunctions];
+                if (pointerFunctions.acquireFunction == NULL) {
+                    return NO;
+                }
+            }
+            BOOL result = RSSWCallOriginal();
+            return result;
+        }), 0, NULL)
 #endif
 #endif
+    }
 }
 
 @end
