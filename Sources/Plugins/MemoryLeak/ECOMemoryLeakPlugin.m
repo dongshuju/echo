@@ -12,7 +12,12 @@
 @implementation ECOMemoryLeakPlugin
 
 + (void)load {
-    [[ECOClient sharedClient] registerPlugin:[self class]];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if ([ECOClient sharedClient].config.retainCircleDetector) {
+            [[ECOClient sharedClient] registerPlugin:[self class]];
+        }
+    });
 }
 
 - (void)dealloc{
@@ -32,8 +37,9 @@
                                                                    @{@"name":@"message",
                                                                      @"weight":@(0.5)
                                                                      }]];
-        [self startMLeakFinderMonitor];
-        
+        if ([ECOClient sharedClient].config.retainCircleDetector) {
+            [self startMLeakFinderMonitor];
+        }
     }
     return self;
 }

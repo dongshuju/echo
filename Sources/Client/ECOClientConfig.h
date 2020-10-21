@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
  * 默认获取CFBundleDisplayName作为appName，你也可以自己修改它
  */
 @property (nonatomic, copy) NSString *appName;
+/**
+ * 是否开启RetainCircleDetector，默认为否
+ */
+@property (nonatomic, assign) BOOL retainCircleDetector;
 
 @end
 
